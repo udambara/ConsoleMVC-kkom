@@ -71,12 +71,20 @@
     <ClInclude Include="include\ConsoleMVC\ConsoleView.h" />
     <ClInclude Include="include\ConsoleMVC\SampleController.h" />
     <ClInclude Include="include\ConsoleMVC\MonitoringController.h" />
+    <ClInclude Include="include\ConsoleMVC\OrderController.h" />
+    <ClInclude Include="include\ConsoleMVC\ApprovalController.h" />
+    <ClInclude Include="include\ConsoleMVC\ProductionController.h" />
+    <ClInclude Include="include\ConsoleMVC\ShippingController.h" />
     <ClInclude Include="include\ConsoleMVC\AppController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ConsoleView.cpp" />
     <ClCompile Include="src\SampleController.cpp" />
     <ClCompile Include="src\MonitoringController.cpp" />
+    <ClCompile Include="src\OrderController.cpp" />
+    <ClCompile Include="src\ApprovalController.cpp" />
+    <ClCompile Include="src\ProductionController.cpp" />
+    <ClCompile Include="src\ShippingController.cpp" />
     <ClCompile Include="src\AppController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

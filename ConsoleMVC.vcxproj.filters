@@ -12,12 +12,20 @@
     <ClCompile Include="src\ConsoleView.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="src\SampleController.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="src\MonitoringController.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="src\OrderController.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="src\ApprovalController.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="src\ProductionController.cpp"><Filter>소스 파일</Filter></ClCompile>
+    <ClCompile Include="src\ShippingController.cpp"><Filter>소스 파일</Filter></ClCompile>
     <ClCompile Include="src\AppController.cpp"><Filter>소스 파일</Filter></ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ConsoleMVC\ConsoleView.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="include\ConsoleMVC\SampleController.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="include\ConsoleMVC\MonitoringController.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="include\ConsoleMVC\OrderController.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="include\ConsoleMVC\ApprovalController.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="include\ConsoleMVC\ProductionController.h"><Filter>헤더 파일</Filter></ClInclude>
+    <ClInclude Include="include\ConsoleMVC\ShippingController.h"><Filter>헤더 파일</Filter></ClInclude>
     <ClInclude Include="include\ConsoleMVC\AppController.h"><Filter>헤더 파일</Filter></ClInclude>
   </ItemGroup>
 </Project>

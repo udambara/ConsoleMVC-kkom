@@ -1,5 +1,6 @@
 #include "ConsoleMVC/ConsoleView.h"
 
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -97,6 +98,135 @@ void ConsoleView::PrintMonitoringMenu() const {
                << "1. 주문량확인\n"
                << "2. 재고량확인\n"
                << "0. 이전 메뉴\n";
+}
+
+void ConsoleView::PrintOrderMenu() const {
+    std::cout << "\n--- 시료주문 ---\n"
+               << "1. 시료예약\n"
+               << "0. 이전 메뉴\n";
+}
+
+NewOrderInput ConsoleView::ReadNewOrderInput() const {
+    NewOrderInput input;
+    std::cout << "시료ID: ";
+    std::getline(std::cin, input.sampleId);
+    std::cout << "고객명: ";
+    std::getline(std::cin, input.customerName);
+    std::cout << "주문수량: ";
+    std::cin >> input.quantity;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return input;
+}
+
+void ConsoleView::PrintApprovalMenu() const {
+    std::cout << "\n--- 시료승인/거절 ---\n"
+               << "1. 접수된 주문목록\n"
+               << "2. 주문승인\n"
+               << "3. 주문거절\n"
+               << "0. 이전 메뉴\n";
+}
+
+void ConsoleView::PrintProductionMenu() const {
+    std::cout << "\n--- 생산라인 ---\n"
+               << "1. 생산현황표기\n"
+               << "2. 대기주문확인\n"
+               << "0. 이전 메뉴\n";
+}
+
+void ConsoleView::PrintShippingMenu() const {
+    std::cout << "\n--- 출고처리 ---\n"
+               << "1. 출고대상 조회\n"
+               << "2. 출고처리\n"
+               << "0. 이전 메뉴\n";
+}
+
+void ConsoleView::PrintOrderTable(const std::vector<dp::Order>& orders, const dp::SampleRepository& sampleRepo) const {
+    if (orders.empty()) {
+        std::cout << "해당하는 주문이 없습니다.\n";
+        return;
+    }
+    std::cout << std::left << std::setw(5) << "번호"
+               << std::setw(20) << "주문번호"
+               << std::setw(12) << "고객명"
+               << std::setw(22) << "시료명"
+               << std::right << std::setw(8) << "수량"
+               << "  " << "상태" << "\n";
+    std::cout << std::string(75, '-') << "\n";
+
+    int index = 1;
+    for (const dp::Order& order : orders) {
+        std::optional<dp::Sample> sample = sampleRepo.FindById(order.sampleId);
+        std::string sampleName = sample.has_value() ? sample->name : order.sampleId;
+
+        std::cout << std::left << std::setw(5) << index
+                   << std::setw(20) << order.orderNo
+                   << std::setw(12) << order.customerName
+                   << std::setw(22) << sampleName
+                   << std::right << std::setw(6) << order.quantity << "ea"
+                   << "  " << dp::ToString(order.status) << "\n";
+        ++index;
+    }
+}
+
+int ConsoleView::ReadIndexChoice(int count, const std::string& prompt) const {
+    std::cout << prompt << " (0=취소, 1~" << count << "): ";
+    int choice = 0;
+    while (!(std::cin >> choice) || choice < 0 || choice > count) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "0~" << count << " 사이의 번호를 입력해주세요: ";
+    }
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return choice;
+}
+
+void ConsoleView::PrintProductionStatus(const std::optional<dp::Order>& current, const dp::SampleRepository& sampleRepo) const {
+    std::cout << "\n[생산현황]\n";
+    if (!current.has_value()) {
+        std::cout << "생산중인 주문이 없습니다.\n";
+        return;
+    }
+
+    std::optional<dp::Sample> sample = sampleRepo.FindById(current->sampleId);
+    std::string sampleName = sample.has_value() ? sample->name : current->sampleId;
+
+    long long elapsed = static_cast<long long>(std::time(nullptr)) - current->productionStartEpochSec;
+    long long remaining = current->totalProductionSeconds - elapsed;
+    if (remaining < 0) remaining = 0;
+
+    std::cout << "주문번호: " << current->orderNo << "\n"
+               << "시료명: " << sampleName << "\n"
+               << "경과시간: " << elapsed << "초 / 총 " << current->totalProductionSeconds << "초\n"
+               << "남은시간: " << remaining << "초\n";
+}
+
+void ConsoleView::PrintWaitingQueue(const std::vector<dp::Order>& waiting, const dp::SampleRepository& sampleRepo) const {
+    std::cout << "\n[대기주문] (FIFO)\n";
+    if (waiting.empty()) {
+        std::cout << "대기중인 주문이 없습니다.\n";
+        return;
+    }
+    int index = 1;
+    for (const dp::Order& order : waiting) {
+        std::optional<dp::Sample> sample = sampleRepo.FindById(order.sampleId);
+        std::string sampleName = sample.has_value() ? sample->name : order.sampleId;
+        std::cout << index << ". " << order.orderNo << " | " << sampleName
+                   << " | " << order.quantity << "ea\n";
+        ++index;
+    }
+}
+
+void ConsoleView::PrintShippingResult(const dp::Order& order) const {
+    std::time_t releasedAt = static_cast<std::time_t>(order.releasedAtEpochSec);
+    std::tm localTime{};
+    localtime_s(&localTime, &releasedAt);
+
+    std::cout << "\n[출고 처리 결과]\n"
+               << "결과: 출고 처리 완료\n"
+               << "주문번호: " << order.orderNo << "\n"
+               << "출고수량: " << order.releasedQty << "ea\n"
+               << "처리일시: " << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S") << "\n"
+               << "상태 변경: CONFIRMED → RELEASE\n";
 }
 
 int ConsoleView::ReadMenuChoice(const std::string& prompt) const {
